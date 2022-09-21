@@ -1,5 +1,5 @@
 package com.morelos.mercado.domain;
-
+import com.morelos.mercado.domain.Category;
 public class Product {
     private int productoId;
     private String name;

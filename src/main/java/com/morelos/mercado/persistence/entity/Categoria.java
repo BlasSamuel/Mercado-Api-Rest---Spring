@@ -37,4 +37,11 @@ public class Categoria {
     public void setEstado(Boolean estado) {
         this.estado = estado;
     }
+
+    public List<Producto> getProductos(List<Producto> productos){
+        return productos;
+    }
+    public void setProductos(List<Producto> productos){
+        this.productos = productos;
+    }
 }

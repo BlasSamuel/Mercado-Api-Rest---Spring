@@ -1,7 +1,6 @@
 package com.morelos.mercado.persistence.mapper;
 
 import com.morelos.mercado.domain.Product;
-import com.morelos.mercado.domain.Producto;
 import com.morelos.mercado.persistence.entity.Producto;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
@@ -22,8 +21,8 @@ public interface ProductMapper {
             @Mapping(source = "categoria", target = "category")
     })
     Product toProduct(Producto producto);
-    List<Product> toProducts(List<> productos);
-    Producto
+    List<Product> toProducts(List<Producto> productos);
+
     @InheritInverseConfiguration
     @Mapping(target = "codigoBarras", ignore = true)
     Producto toProducto(Product product);

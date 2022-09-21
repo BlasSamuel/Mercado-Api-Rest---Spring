@@ -5,6 +5,7 @@ import com.morelos.mercado.persistence.crud.ProductoCrudRepository;
 import com.morelos.mercado.domain.Product;
 import com.morelos.mercado.persistence.entity.Producto;
 import com.morelos.mercado.persistence.mapper.ProductMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -12,7 +13,9 @@ import java.util.Optional;
 
 @Repository
 public class ProductoRepository implements ProductRepository {
+    @Autowired
     private ProductoCrudRepository productoCrudRepository;
+    @Autowired
     private ProductMapper mapper;
 
     @Override
