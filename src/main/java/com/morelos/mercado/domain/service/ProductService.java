@@ -31,10 +31,11 @@ public class ProductService {
             return true;
         }).orElse(false);
     }
-    public boolean remove(int productId){
+    /*public boolean remove(int productId){
         return getProduct(productId).map(product -> {
+            product.setActive();
             productRepository.remove(productId);
             return true;
         }).orElse(false);
-    }
+    }*/
 }
