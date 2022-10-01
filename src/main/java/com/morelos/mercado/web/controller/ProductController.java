@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
+
 
 @RestController
 @RequestMapping("/products")
@@ -28,7 +28,7 @@ public class ProductController {
 
     @GetMapping("/category/{categoryId}")
     public ResponseEntity<List<Product>> getByCategory(@PathVariable("categoryId") int categoryId) {
-        return productService.getByCategory(categoryId).map(products -> products.isEmpty() ? new ResponseEntity<>(products, HttpStatus.OK ) : new ResponseEntity<>(products,HttpStatus.NOT_FOUND )
+        return productService.getByCategory(categoryId).map(products -> products.isEmpty() ? new ResponseEntity<>(products, HttpStatus.NOT_FOUND ) : new ResponseEntity<>(products,HttpStatus.OK )
         ).orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
