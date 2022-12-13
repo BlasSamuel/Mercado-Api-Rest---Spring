@@ -26,7 +26,13 @@ public class MercadoUserDetailsService  implements UserDetailsService {
     @Override
     public  UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         //{noop} permite agregar la contraseña sin estar encriptada
-        return new User("admin", "{noop}Morelos.2022", new ArrayList<>());
+       // return new User("admin", "{noop}Morelos.2022", new ArrayList<>());
+        if ("admin".equals(username) ) {
+            return new User("admin", "{noop}Morelos.2022", new ArrayList<>());
+        } else {
+            //throw new UsernameNotFoundException("User not found with username: " + username);
+            return null;
+        }
 
     }
 }

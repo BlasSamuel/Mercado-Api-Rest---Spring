@@ -9,8 +9,10 @@ import com.morelos.mercado.web.security.JWTUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -33,30 +35,27 @@ public class AuthController {
 
     //public ResponseEntity<AuthenticationResponse> createToken(@RequestBody AuthenticationRequest request) {
 
-        public ResponseEntity<?> createToken(@RequestBody AuthenticationRequest request) {
-        JsonResponse json = new JsonResponse(false,new ArrayList<>(),"");
+    public ResponseEntity<?> createToken(@RequestBody AuthenticationRequest request) {
+        JsonResponse json = new JsonResponse(false, new ArrayList<>(), "");
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
             UserDetails user = mercadoUserDetailsService.loadUserByUsername(request.getUsername());
             String jwt = jwtUtil.generateToken(user);
+
             json.success = true;
             ArrayList<AuthenticationResponse> data = new ArrayList<AuthenticationResponse>();
             data.add(new AuthenticationResponse(jwt));
             json.data = data;
-            return new ResponseEntity<>(json, HttpStatus.OK);
+
         } catch (BadCredentialsException e) {
             json.error = e.getMessage();
-            return new ResponseEntity<>(json,HttpStatus.FORBIDDEN);
+
         }
+
+        return new ResponseEntity<>(json, HttpStatus.OK);
     }
 
-/*
-* public ResponseEntity<Product> getProduct(
-            // @Apiparam() anotación para identificador que recibe la petición, es obligatorio
-            @ApiParam(value = "El id del producto", required = true, example = "7") @PathVariable("id") int productId) {
-        return productService.getProduct(productId).map(product -> new ResponseEntity<>(product, HttpStatus.OK)).orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
-    }
-* */
+
 
 
 }

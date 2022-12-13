@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 
 @RestController
@@ -49,13 +51,25 @@ public class ProductController {
             // @Apiparam() anotación para identificador que recibe la petición, es obligatorio
             @ApiParam(value = "El id del producto", required = true, example = "7") @PathVariable("id") int productId) {
         JsonResponse json = new JsonResponse(false, new ArrayList<>(), "");
-        ArrayList<Product> data = new ArrayList<Product>();
-        System.out.println(productService.getProduct(productId));
-        return new ResponseEntity<>(json, HttpStatus.FORBIDDEN);
-       /* return productService.getProduct(productId).map(product ->  {
-            data.add(product);
+        HttpStatus status = HttpStatus.NOT_FOUND;
+        try {
 
-        } ).orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));*/
+            Product p = productService.getProduct(productId).orElse(null);
+            if (Objects.isNull(p)) {
+                throw new Exception("producto no disponible");
+            } else {
+                ArrayList<Product> data = new ArrayList<Product>();
+                data.add(p);
+                json.data = data;
+                status = HttpStatus.OK;
+                json.success = true;
+            }
+
+        } catch (Exception e) {
+            json.error = e.getMessage();
+        }
+        return new ResponseEntity<>(json, status);
+
     }
 
     @GetMapping("/category/{categoryId}")
@@ -64,9 +78,23 @@ public class ProductController {
             @ApiResponse(code = 200, message = "OK"),
             @ApiResponse(code = 404, message = "Productos no encontrados")
     })
-    public ResponseEntity<List<Product>> getByCategory(@PathVariable("categoryId") int categoryId) {
-        return productService.getByCategory(categoryId).map(products -> products.isEmpty() ? new ResponseEntity<>(products, HttpStatus.NOT_FOUND) : new ResponseEntity<>(products, HttpStatus.OK)
-        ).orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    public ResponseEntity<JsonResponse> getByCategory(@PathVariable("categoryId") int categoryId) {
+        //  return productService.getByCategory(categoryId).map(products -> products.isEmpty() ? new ResponseEntity<>(products, HttpStatus.NOT_FOUND) : new ResponseEntity<>(products, HttpStatus.OK)
+        // ).orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+
+
+        JsonResponse json = new JsonResponse(true, new ArrayList<>(), "");
+        HttpStatus status = HttpStatus.NOT_FOUND;
+        try {
+            List<Product> products = productService.getByCategory(categoryId).orElse(new ArrayList<>());
+            status = (products.isEmpty() ? HttpStatus.OK : HttpStatus.FORBIDDEN);
+            json.data = (ArrayList) products;
+
+
+        } catch (Exception e) {
+            json.error = e.getMessage();
+        }
+        return new ResponseEntity<>(json, status);
     }
 
     @PostMapping("/save")
