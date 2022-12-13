@@ -1,6 +1,7 @@
 package com.morelos.mercado.web.controller;
 
 
+import com.morelos.mercado.domain.JsonResponse;
 import com.morelos.mercado.domain.dto.AuthenticationRequest;
 import com.morelos.mercado.domain.dto.AuthenticationResponse;
 import com.morelos.mercado.domain.service.MercadoUserDetailsService;
@@ -13,6 +14,9 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+//import org.springframework.boot.configurationprocessor.json.JSONObject;
+import java.util.ArrayList;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/auth")
@@ -27,18 +31,22 @@ public class AuthController {
 
     @PostMapping("/authenticate")
 
-    public ResponseEntity<AuthenticationResponse> createToken(@RequestBody AuthenticationRequest request) {
+    //public ResponseEntity<AuthenticationResponse> createToken(@RequestBody AuthenticationRequest request) {
+
+        public ResponseEntity<?> createToken(@RequestBody AuthenticationRequest request) {
+        JsonResponse json = new JsonResponse(false,new ArrayList<>(),"");
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
             UserDetails user = mercadoUserDetailsService.loadUserByUsername(request.getUsername());
-            //System.out.println(user);
-            //user.map(user -> {new ResponseEntity<>(user, HttpStatus.OK);}).orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
             String jwt = jwtUtil.generateToken(user);
-            return new ResponseEntity<>(new AuthenticationResponse(jwt), HttpStatus.OK);
-
-
+            json.success = true;
+            ArrayList<AuthenticationResponse> data = new ArrayList<AuthenticationResponse>();
+            data.add(new AuthenticationResponse(jwt));
+            json.data = data;
+            return new ResponseEntity<>(json, HttpStatus.OK);
         } catch (BadCredentialsException e) {
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            json.error = e.getMessage();
+            return new ResponseEntity<>(json,HttpStatus.FORBIDDEN);
         }
     }
 

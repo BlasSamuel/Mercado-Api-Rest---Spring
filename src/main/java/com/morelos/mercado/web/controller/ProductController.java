@@ -1,13 +1,17 @@
 package com.morelos.mercado.web.controller;
 
+import com.morelos.mercado.domain.JsonResponse;
 import com.morelos.mercado.domain.Product;
+import com.morelos.mercado.domain.dto.AuthenticationResponse;
 import com.morelos.mercado.domain.service.ProductService;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -19,26 +23,43 @@ public class ProductController {
 
     @GetMapping("/all")
     //@ApiOperation("Listar todos los productos") //descripción para la dacumentación de swagger2
-    @ApiOperation(value = "Listar todos los productos", authorizations = { @Authorization(value="JWT") })
+    @ApiOperation(value = "Listar todos los productos", authorizations = {@Authorization(value = "JWT")})
     @ApiResponse(code = 200, message = "OK") //estatus para documentación
-    public ResponseEntity<List<Product>> getAll() {
-        return new ResponseEntity<>(productService.getAll(), HttpStatus.OK);
+    // public ResponseEntity<List<Product>> getAll() {
+    public ResponseEntity<?> getAll() {
+        JsonResponse json = new JsonResponse(false, new ArrayList<>(), "");
+        try {
+            json.data = (ArrayList) productService.getAll();
+            json.success = true;
+            return new ResponseEntity<>(json, HttpStatus.OK);
+        } catch (Exception e) {
+            json.error = e.getMessage();
+            return new ResponseEntity<>(json, HttpStatus.FORBIDDEN);
+        }
     }
 
     @PostMapping("/{id}")
-    @ApiOperation(value = "Buscar un producto por ID", authorizations = { @Authorization(value="JWT") }) //descripción para la documentación de swagger2
+    @ApiOperation(value = "Buscar un producto por ID", authorizations = {@Authorization(value = "JWT")})
+    //descripción para la documentación de swagger2
     @ApiResponses({//declaración de un objeto porque puede retornar culaquiera de los siguientes valores
             @ApiResponse(code = 200, message = "OK"),
             @ApiResponse(code = 404, message = "Producto no encontrado")
     })
-    public ResponseEntity<Product> getProduct(
+    public ResponseEntity<?> getProduct(
             // @Apiparam() anotación para identificador que recibe la petición, es obligatorio
             @ApiParam(value = "El id del producto", required = true, example = "7") @PathVariable("id") int productId) {
-        return productService.getProduct(productId).map(product -> new ResponseEntity<>(product, HttpStatus.OK)).orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        JsonResponse json = new JsonResponse(false, new ArrayList<>(), "");
+        ArrayList<Product> data = new ArrayList<Product>();
+        System.out.println(productService.getProduct(productId));
+        return new ResponseEntity<>(json, HttpStatus.FORBIDDEN);
+       /* return productService.getProduct(productId).map(product ->  {
+            data.add(product);
+
+        } ).orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));*/
     }
 
     @GetMapping("/category/{categoryId}")
-    @ApiOperation(value = "Retornar lista de productos por el id de la categoria", authorizations = { @Authorization(value="JWT") })
+    @ApiOperation(value = "Retornar lista de productos por el id de la categoria", authorizations = {@Authorization(value = "JWT")})
     @ApiResponses({//declaración de un objeto porque puede retornar culaquiera de los siguientes valores
             @ApiResponse(code = 200, message = "OK"),
             @ApiResponse(code = 404, message = "Productos no encontrados")
@@ -49,7 +70,7 @@ public class ProductController {
     }
 
     @PostMapping("/save")
-    @ApiOperation(value = "guardar un producto", authorizations = { @Authorization(value="JWT") })
+    @ApiOperation(value = "guardar un producto", authorizations = {@Authorization(value = "JWT")})
     @ApiResponse(code = 201, message = "CREATED")
     public ResponseEntity<Product> save(@RequestBody Product product) {
         return new ResponseEntity<>(productService.save(product), HttpStatus.CREATED);
@@ -57,7 +78,7 @@ public class ProductController {
 
 
     @DeleteMapping("/delete/{id}")
-    @ApiOperation(value = "eliminar un producto por id", authorizations = { @Authorization(value="JWT") })
+    @ApiOperation(value = "eliminar un producto por id", authorizations = {@Authorization(value = "JWT")})
     @ApiResponse(code = 404, message = "NOT_FOUND")
     public ResponseEntity delete(@PathVariable("id") int productoId) {
         return new ResponseEntity(productService.delete(productoId) ? HttpStatus.OK : HttpStatus.NOT_FOUND);
