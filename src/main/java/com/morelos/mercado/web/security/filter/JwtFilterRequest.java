@@ -52,13 +52,10 @@ public class JwtFilterRequest extends OncePerRequestFilter { // OncePerRequestFi
                 String username = null;
                 try {
                     username = jwtUtil.extractUsername(jwt);
-                }catch (Exception e){
-                    //System.out.println(e.getMessage());
+                } catch (Exception e) {
                     errorDetails.put("error", "JWT expired");
                     response.setStatus(HttpStatus.UNAUTHORIZED.value());
-                   // response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-                    mapper.writeValue(response.getOutputStream (), errorDetails);
-                    //mapper.writeValue(response.getWriter(), e.getMessage());
+                    mapper.writeValue(response.getOutputStream(), errorDetails);
                 }
 
                 if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
@@ -70,11 +67,8 @@ public class JwtFilterRequest extends OncePerRequestFilter { // OncePerRequestFi
                     }
                 }
             } else {
-
-
                 errorDetails.put("error", "Invalid token");
                 response.setStatus(HttpStatus.UNAUTHORIZED.value());
-               // response.setContentType(MediaType.APPLICATION_JSON_VALUE);
                 mapper.writeValue(response.getOutputStream(), errorDetails);
             }
 
